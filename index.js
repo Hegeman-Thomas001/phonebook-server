@@ -30,6 +30,13 @@ app.get("/", (req, res) => {
   res.send("<h1>Hellooo!</h1>");
 });
 
+app.get("/info", (req, res) => {
+  res.status(200).json({
+    msg: `Phonebook has info for ${persons.length} people`,
+    date: new Date(),
+  });
+});
+
 app.get("/api/persons", (req, res) => {
   res.json(persons);
 });
@@ -53,22 +60,32 @@ const generateId = () => {
 };
 
 app.post("/api/persons", (req, res) => {
-  const { content, important } = req.body;
+  const { name, number } = req.body;
 
-  if (!content) {
-    return res.status(400).json({ error: "content missing" });
+  if (!name) {
+    return res.status(400).json({ error: "name missing" });
+  }
+  if (!number) {
+    return res.status(400).json({ error: "number missing" });
+  }
+
+  const nameFound = persons.find(
+    (person) => person.name.toLowerCase() === name.toLowerCase()
+  );
+  if (nameFound) {
+    return res.status(400).json({ error: "name already in phonebook" });
   }
 
   const person = {
     id: generateId(),
-    content,
-    important: important || false,
+    name,
+    number,
     date: new Date(),
   };
 
   persons = [...persons, person];
 
-  res.json(person);
+  return res.status(200).json(person);
 });
 
 app.delete("/api/persons/:id", (req, res) => {
