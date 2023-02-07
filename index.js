@@ -1,8 +1,13 @@
 const cors = require("cors");
 const express = require("express");
+const mongoose = require("mongoose");
 const morgan = require("morgan");
 //
+const connectDB = require("./config/database");
+//
 require("dotenv").config({ path: "./config/.env" });
+mongoose.set("strictQuery", false);
+connectDB();
 
 let persons = [
   {
@@ -35,6 +40,7 @@ morgan.token("body", (req) => {
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
